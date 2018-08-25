@@ -15,7 +15,7 @@ $ cd natural-adversary-pytorch/
 $ python main.py --mode train
 ```
 
-#### 3. Test
+#### 3. Generate natural adversary examples
 ```bash
 $ python main.py --mode generate --resume_iters 1000
 ```
