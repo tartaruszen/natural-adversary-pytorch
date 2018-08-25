@@ -1,5 +1,5 @@
 # natural-adversary-pytorch
-Pytorch implementation of ["Generating Natural Adversarial Examples (ICLR 2018)"](
+Pytorch implementation of [Generating Natural Adversarial Examples](https://arxiv.org/abs/1710.11342).
 
 
 ## Usage
