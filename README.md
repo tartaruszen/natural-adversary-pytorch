@@ -1,5 +1,5 @@
 # natural-adversary-pytorch
-Pytorch implementation of "Generating Natural Adversarial Examples (ICLR 2018)"
+Pytorch implementation of ["Generating Natural Adversarial Examples (ICLR 2018)"](
 
 
 ## Usage
@@ -19,3 +19,7 @@ $ python main.py --mode train
 ```bash
 $ python main.py --mode generate --resume_iters 1000
 ```
+
+## Results
+
+<p align="center"><img width="100%" src="PNG/results.png" /></p>
