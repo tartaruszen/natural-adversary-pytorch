@@ -134,17 +134,12 @@ class Solver(object):
                 fake_images = self.G(noise)
                 d_fake_loss = self.D(fake_images)
 
-
-                print ('images', images)
-                print ('fake_images', fake_images)
-
-
                 # Compute loss for gradient penalty.
                 alpha = torch.rand(images.size(0), 1, 1, 1).to(self.device)
                 x_hat = alpha * fake_images + (1-alpha) * images
                 d_gp_loss = self.gradient_penalty(self.D(x_hat), x_hat)
 
-                d_loss = torch.mean(d_real_loss) - torch.mean(d_fake_loss) + self.lambda_gp * d_gp_loss
+                d_loss = torch.mean(d_fake_loss) - torch.mean(d_real_loss) + self.lambda_gp * d_gp_loss
 
                 # Backprop and optimize.
                 self.reset_grad()
@@ -166,7 +161,7 @@ class Solver(object):
 
                 # ================== Train the generator. =================== #
                 # Compute loss.
-                g_loss = torch.mean(self.D(self.G(noise)))
+                g_loss = -torch.mean(self.D(self.G(noise)))
 
                 # Backprop and optimize.
                 self.reset_grad()
@@ -229,24 +224,6 @@ class Solver(object):
             cla_path = os.path.join(self.cla_dir, self.classifier, '{}_lenet.ckpt'.format(self.cla_iters))
             C.load_state_dict(torch.load(cla_path, map_location=lambda storage, loc: storage))
 
-        # Save misclassified test inputs.
-        '''for j, (images, labels) in enumerate(self.test_loader):
-            for i in range(32):
-                x = images[i].unsqueeze(0).to(self.device)
-                y = labels[i].data.cpu().numpy()
-                y_pred = C(x)
-                y_pred = torch.argmax(y_pred, dim=1).data.cpu().numpy()
-                if y_pred != y:
-                    real_test = {'x': x.squeeze(0).squeeze(0).data.cpu().numpy(),
-                                 'y': y,
-                                 'y_pred': int(y_pred)}
-                    real_test_path = os.path.join(self.config.test_dir,
-                                                  '{}_{}_{}_{}_{}.jpg'.format(self.dataset, self.classifier,
-                                                                           'test', j+1, i+1))
-                    self.save_real_test(real_test, real_test_path)
-                    print ('Saved test input...')
-                    break'''
-
         # Generate adversary examples.
         for j, (images, labels) in enumerate(self.test_loader):
             for i in range(32):
@@ -272,18 +249,6 @@ class Solver(object):
                      interpolation='none', cmap=plt.get_cmap('gray'))
         ax[1].text(1, 5, str(adversary['y_adv']), color='white', fontsize=20)
         ax[1].axis('off')
-
-        fig.savefig(filename)
-        plt.close()
-
-    def save_real_test(self, adversary, filename):
-        fig, ax = plt.subplots(1, 1, figsize=(3, 3))
-
-        ax.imshow(adversary['x'],
-                     interpolation='none', cmap=plt.get_cmap('gray'))
-        ax.text(1, 5, str(adversary['y']), color='white', fontsize=20)
-        ax.text(4, 5, str(adversary['y_pred']), color='white', fontsize=20)
-        ax.axis('off')
 
         fig.savefig(filename)
         plt.close()
